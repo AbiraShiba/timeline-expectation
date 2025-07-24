@@ -171,7 +171,8 @@
         return;
       }
       const expectedTime = computeExpectedTime(p_list, T_list);
-      resultDiv.innerHTML = '期待時間 [sec]（理論値）:<br><b style="font-size:1.4em;color:#246;">' + expectedTime.toFixed(5) + '</b>';
+      resultDiv.innerHTML = '期待時間（理論値）:<br><b style="font-size:1.4em;color:#246;">' + expectedTime.toFixed(5) + '</b>';
+      resultDiv.innerHTML = '（※時間の単位は時間リストに入力したものと同じ）';
     }
   
     // 入力欄の値が変更されたら即座に保存＆計算
