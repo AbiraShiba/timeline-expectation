@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>期待時間計算機</title>
+  <style>
+    body { font-family: sans-serif; margin: 2em; background: #f7f7fa; }
+    input, textarea { width: 300px; font-size: 1em; }
+    .output { margin-top: 1em; font-size: 1.2em; }
+  </style>
+</head>
+<body>
+  <h2>期待時間計算機</h2>
+  <div>
+    <label>p_list (カンマ区切りで確率を入力):<br>
+      <input id="p_list" value="0.8, 0.9, 0.4">
+    </label>
+  </div>
+  <div>
+    <label>T_list (カンマ区切りで時間を入力):<br>
+      <input id="T_list" value="4, 15, 31, 41">
+    </label>
+  </div>
+  <button onclick="calculate()">計算</button>
+  <div class="output" id="result"></div>
+  
+  <script>
+    function parseInput(input) {
+      return input.split(',').map(s => parseFloat(s.trim()));
+    }
+
+    function computeExpectedTime(p_list, T_list) {
+      const n = p_list.length;
+      let result = 0.0;
+      for (let k = 0; k < n; ++k) {
+        // p_list[k:] の積
+        let prod = 1.0;
+        for (let j = k; j < n; ++j) prod *= p_list[j];
+        result += (1 - p_list[k]) / prod * T_list[k];
+      }
+      return result + T_list[n];
+    }
+
+    function calculate() {
+      const p_list = parseInput(document.getElementById('p_list').value);
+      const T_list = parseInput(document.getElementById('T_list').value);
+      if (T_list.length !== p_list.length + 1) {
+        document.getElementById('result').innerHTML =
+          'T_listの要素数は p_list+1 でなければなりません。';
+        return;
+      }
+      const expectedTime = computeExpectedTime(p_list, T_list);
+      document.getElementById('result').innerHTML =
+        '期待時間（理論値）: <b>' + expectedTime.toFixed(5) + '</b>';
+    }
+  </script>
+</body>
+</html>
