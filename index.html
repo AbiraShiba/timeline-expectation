@@ -131,10 +131,14 @@
     <div class="output" id="result"></div>
   </div>
   <script>
+    // ローカルストレージ用キー
+    const LS_P_LIST = 'timeline_p_list';
+    const LS_T_LIST = 'timeline_t_list';
+  
     function parseInput(input) {
       return input.split(',').map(s => parseFloat(s.trim()));
     }
-
+  
     function computeExpectedTime(p_list, T_list) {
       const n = p_list.length;
       let result = 0.0;
@@ -145,10 +149,16 @@
       }
       return result + T_list[n];
     }
-
+  
     function calculate() {
-      const p_list = parseInput(document.getElementById('p_list').value);
-      const T_list = parseInput(document.getElementById('T_list').value);
+      const pVal = document.getElementById('p_list').value;
+      const tVal = document.getElementById('T_list').value;
+      // 入力内容を保存
+      localStorage.setItem(LS_P_LIST, pVal);
+      localStorage.setItem(LS_T_LIST, tVal);
+  
+      const p_list = parseInput(pVal);
+      const T_list = parseInput(tVal);
       const resultDiv = document.getElementById('result');
       resultDiv.innerHTML = '';
       if (p_list.some(isNaN) || T_list.some(isNaN)) {
@@ -162,8 +172,23 @@
       const expectedTime = computeExpectedTime(p_list, T_list);
       resultDiv.innerHTML = '期待時間 [sec]（理論値）:<br><b style="font-size:1.4em;color:#246;">' + expectedTime.toFixed(5) + '</b>';
     }
-    // 自動計算（初期表示）
-    window.onload = () => calculate();
+  
+    // 入力欄の値が変更されたら即座に保存＆計算
+    document.addEventListener('DOMContentLoaded', () => {
+      const pInput = document.getElementById('p_list');
+      const tInput = document.getElementById('T_list');
+      // 保存されている値で初期化
+      const pVal = localStorage.getItem(LS_P_LIST);
+      const tVal = localStorage.getItem(LS_T_LIST);
+      if (pVal !== null) pInput.value = pVal;
+      if (tVal !== null) tInput.value = tVal;
+  
+      // 入力時に自動保存・自動再計算
+      pInput.addEventListener('input', calculate);
+      tInput.addEventListener('input', calculate);
+  
+      calculate(); // 初期表示
+    });
   </script>
 </body>
 </html>
