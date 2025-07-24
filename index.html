@@ -17,7 +17,7 @@
     </label>
   </div>
   <div>
-    <label>カンマ区切りで時間[sec]を入力:<br>
+    <label>カンマ区切りで時間 [sec] を入力:<br>
       （※ 確率の入力数よりも、戦闘終了時間を加えて<b>1つ多く</b>入力してください）<br>
       <input id="T_list" value="4, 15, 31, 41">
     </label>
@@ -52,7 +52,7 @@
       }
       const expectedTime = computeExpectedTime(p_list, T_list);
       document.getElementById('result').innerHTML =
-        '期待時間[sec]（理論値）: <b>' + expectedTime.toFixed(5) + '</b>';
+        '期待時間 [sec]（理論値）:  <b>' + expectedTime.toFixed(5) + '</b>';
     }
   </script>
 </body>
