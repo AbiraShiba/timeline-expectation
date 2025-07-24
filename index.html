@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>期待時間計算機</title>
+  <title>タイムライン期待時間計算機</title>
   <style>
     body { font-family: sans-serif; margin: 2em; background: #f7f7fa; }
     input, textarea { width: 300px; font-size: 1em; }
@@ -10,14 +10,15 @@
   </style>
 </head>
 <body>
-  <h2>期待時間計算機</h2>
+  <h2>タイムライン期待時間計算機</h2>
   <div>
-    <label>p_list (カンマ区切りで確率を入力):<br>
+    <label>カンマ区切りで確率を入力:<br>
       <input id="p_list" value="0.8, 0.9, 0.4">
     </label>
   </div>
   <div>
-    <label>T_list (カンマ区切りで時間[sec]を入力):<br>
+    <label>カンマ区切りで時間[sec]を入力:<br>
+      （※ 確率の入力数よりも、戦闘終了時間を加えて<b>1つ多く</b>入力してください）<br>
       <input id="T_list" value="4, 15, 31, 41">
     </label>
   </div>
