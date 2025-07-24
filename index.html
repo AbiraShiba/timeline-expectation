@@ -17,7 +17,7 @@
     </label>
   </div>
   <div>
-    <label>T_list (カンマ区切りで時間を入力):<br>
+    <label>T_list (カンマ区切りで時間[sec]を入力):<br>
       <input id="T_list" value="4, 15, 31, 41">
     </label>
   </div>
@@ -51,7 +51,7 @@
       }
       const expectedTime = computeExpectedTime(p_list, T_list);
       document.getElementById('result').innerHTML =
-        '期待時間（理論値）: <b>' + expectedTime.toFixed(5) + '</b>';
+        '期待時間[sec]（理論値）: <b>' + expectedTime.toFixed(5) + '</b>';
     }
   </script>
 </body>
