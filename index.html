@@ -124,7 +124,7 @@
         const pInput = document.createElement('input');
         pInput.type = 'text';
         pInput.className = 'prob';
-        pInput.placeholder = `イベント ${i + 1} の確率（％）例：80）`;
+        pInput.placeholder = `イベント ${i + 1} の確率（例：80）`;
         pInput.style.flex = '1';
         pInput.addEventListener('focus', e => e.target.select());
         pInput.addEventListener('input', saveInputs);
