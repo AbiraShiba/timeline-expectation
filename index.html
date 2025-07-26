@@ -90,10 +90,10 @@
     <button onclick="generateInputs()">入力欄を生成</button>
 
     <div id="input_area"></div>
+    <div class="output" id="result"></div>
     <svg id="timeline"
       style="margin-top:24px; width:100%; height:auto; min-height:200px; border:1px solid #ccc; display:block;"
       preserveAspectRatio="xMinYMin meet"></svg>
-    <div class="output" id="result"></div>
   </div>
 
   <script>
@@ -104,6 +104,11 @@
     function generateInputs() {
       const countInput = document.getElementById('event_count');
       const count = parseInt(countInput.value);
+      if (count < 1 || count > 100) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = '<span style="color:#d15;">イベント数は1以上100以下として下さい。</span>';
+        return;
+      }
       localStorage.setItem(LS_EVENT_COUNT, count);
 
       const inputArea = document.getElementById('input_area');
@@ -122,7 +127,7 @@
         const pInput = document.createElement('input');
         pInput.type = 'text';
         pInput.className = 'prob';
-        pInput.placeholder = `p[${i}] 例: 0.9`;
+        pInput.placeholder = `イベント${i + 1}の確率 例: 0.5`;
         pInput.style.flex = '1';
         pInput.addEventListener('focus', e => e.target.select());
         pInput.addEventListener('input', saveInputs);
@@ -130,13 +135,13 @@
         const tInput = document.createElement('input');
         tInput.type = 'text';
         tInput.className = 'time';
-        tInput.placeholder = `T[${i}] 例: 10`;
+        tInput.placeholder = `イベント${i + 1}の時間 例: 32`;
         tInput.style.flex = '1';
         tInput.addEventListener('focus', e => e.target.select());
         tInput.addEventListener('input', saveInputs);
 
-        row.appendChild(tInput);
         row.appendChild(pInput);
+        row.appendChild(tInput);
         inputArea.appendChild(row);
       }
 
@@ -145,22 +150,22 @@
       row.style.gap = '1em';
       row.style.marginBottom = '6px';
 
-      const tInput = document.createElement('input');
-      tInput.type = 'text';
-      tInput.className = 'time';
-      tInput.placeholder = `T[${count}] 例: 99`;
-      tInput.style.flex = '1';
-      tInput.addEventListener('focus', e => e.target.select());
-      tInput.addEventListener('input', saveInputs);
-
       const hiddenProbInput = document.createElement('input');
       hiddenProbInput.type = 'text';
       hiddenProbInput.className = 'dummy';
       hiddenProbInput.style.visibility = 'hidden';
       hiddenProbInput.style.flex = '1';
 
-      row.appendChild(tInput);
+      const tInput = document.createElement('input');
+      tInput.type = 'text';
+      tInput.className = 'time';
+      tInput.placeholder = `戦闘終了時間 例: 99`;
+      tInput.style.flex = '1';
+      tInput.addEventListener('focus', e => e.target.select());
+      tInput.addEventListener('input', saveInputs);
+
       row.appendChild(hiddenProbInput);
+      row.appendChild(tInput);
       inputArea.appendChild(row);
 
       const spacer = document.createElement('div');
