@@ -13,7 +13,7 @@
       padding: 0;
     }
     .container {
-      max-width: 400px;
+      max-width: 700px;
       margin: 48px auto;
       background: #fff;
       border-radius: 18px;
@@ -29,35 +29,22 @@
       margin-bottom: 6px;
       letter-spacing: 0.02em;
     }
-    .desc {
-      font-size: 0.97em;
-      color: #666;
-      text-align: center;
-      margin-bottom: 18px;
-    }
     label {
       font-weight: bold;
       color: #234;
-      margin-bottom: 6px;
       display: block;
     }
-    input[type="text"] {
+    input[type="number"], input[type="text"] {
       width: 100%;
       font-size: 1.1em;
       padding: 0.7em 0.6em;
       border: 1.5px solid #bcc3f2;
       border-radius: 9px;
-      margin-top: 3px;
+      margin-top: 6px;
       box-sizing: border-box;
       background: #f6f8ff;
-      transition: border-color 0.2s;
-    }
-    input[type="text"]:focus {
-      border-color: #4157d9;
-      outline: none;
     }
     button {
-      margin-top: 10px;
       background: linear-gradient(90deg, #4157d9 70%, #54a2e7 100%);
       color: #fff;
       font-size: 1.08em;
@@ -67,81 +54,115 @@
       padding: 0.8em;
       cursor: pointer;
       box-shadow: 0 2px 8px #c2d0f8aa;
-      transition: background 0.2s, transform 0.08s;
-    }
-    button:hover, button:focus {
-      background: linear-gradient(90deg, #2747d5 60%, #35a7ee 100%);
-      transform: translateY(-2px) scale(1.02);
     }
     .output {
-      margin-top: 16px;
-      padding: 1em 0.7em;
+      padding: 1em;
       background: #f1f5ff;
       border-radius: 9px;
-      min-height: 2em;
       font-size: 1.17em;
       color: #264386;
       text-align: center;
-      box-shadow: 0 2px 8px #c2d0f84d;
     }
-    @media (max-width: 600px) {
-      .container { max-width: 95vw; padding: 16px 7vw 20px 7vw;}
-      h2 { font-size: 1.23em;}
-      .desc { font-size: 0.96em; }
-      .output { font-size: 1em; }
-    }
-    .attention {
-      margin-top: 1.4em;
-      padding: 1em 1em 0.8em 1em;
-      background: #f2f6ff;
-      border-left: 5px solid #4157d9;
-      border-radius: 10px;
-      font-size: 1em;
-      color: #284295;
-      box-shadow: 0 2px 8px #b8c3ff22;
+    svg {
+      margin-top: 24px;
+      width: 100%;
+      height: 200px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>タイムライン期待時間計算機</h2>
-    <div class="desc">
-      <ul style="padding-left:1.5em; margin:0 0 0.7em 0.2em;">
-        各イベントにおける<br>
-        <li><b>確率リスト</b>：イベントの成功確率</li>
-        <li><b>時間リスト</b>：イベントの発生時間</li>
-        を<b>カンマ区切りで</b>入力してください。
-      </ul>
-      <div class="attention">
-        <b>※注意：</b><br>
-        <span style="font-size:0.98em;">
-          時間リストは、<b>確率リストより1つ多く</b>入力してください。<br>
-          （入力は各イベントの発生時間と、<b>成功した場合の終了時間</b>です）
-        </span>
-      </div>
-    </div>
-    <div>
-      <label for="p_list">確率リスト <span style="font-weight:normal; color:#789;">例: 0.8, 0.9, 0.4</span></label>
-      <input id="p_list" type="text" value="0.8, 0.9, 0.4" autocomplete="off" spellcheck="false">
-    </div>
-    <div>
-      <label for="T_list">時間リスト <span style="font-weight:normal; color:#789;">例: 4, 15, 31, 41</span></label>
-      <input id="T_list" type="text" value="4, 15, 31, 41" autocomplete="off" spellcheck="false">
-    </div>
-<!--     <button onclick="calculate()">計算</button> -->
+
+    <label for="event_count">イベント数</label>
+    <input type="number" id="event_count" min="1" value="3">
+    <button onclick="generateInputs()">入力欄を生成</button>
+
+    <div id="input_area"></div>
+    <svg id="timeline" style="margin-top:24px; width:100%; height:auto; min-height:200px; border:1px solid #ccc; display:block;" preserveAspectRatio="xMinYMin meet"></svg>
     <div class="output" id="result"></div>
-    <div>（※時間の単位は時間リストに入力したものと同じ）</div>
   </div>
+
   <script>
-    // ローカルストレージ用キー
     const LS_P_LIST = 'timeline_p_list';
     const LS_T_LIST = 'timeline_t_list';
-  
-    function parseInput(input) {
-      return input.split(',').map(s => parseFloat(s.trim()));
+    const LS_EVENT_COUNT = 'timeline_event_count';
+
+    function generateInputs() {
+      const countInput = document.getElementById('event_count');
+      const count = parseInt(countInput.value);
+      localStorage.setItem(LS_EVENT_COUNT, count);
+
+      const inputArea = document.getElementById('input_area');
+      inputArea.innerHTML = '';
+
+      const pLabel = document.createElement('label');
+      pLabel.textContent = `確率リスト（成功確率）:`;
+      inputArea.appendChild(pLabel);
+
+      for (let i = 0; i < count; i++) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'prob';
+        input.placeholder = `p[${i}] 例: 0.9`;
+        input.addEventListener('focus', e => e.target.select());
+        inputArea.appendChild(input);
+      }
+
+      const tLabel = document.createElement('label');
+      tLabel.textContent = `時間リスト（発生時刻 + 終了時刻）:`;
+      inputArea.appendChild(tLabel);
+
+      for (let i = 0; i < count + 1; i++) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'time';
+        input.placeholder = `T[${i}] 例: 10`;
+        input.addEventListener('focus', e => e.target.select());
+        inputArea.appendChild(input);
+      }
+
+      const spacer = document.createElement('div');
+      spacer.style.height = '1em';
+      inputArea.appendChild(spacer);
+      const calcBtn = document.createElement('button');
+      calcBtn.textContent = '計算';
+      calcBtn.style.width = '100%';
+      calcBtn.onclick = calculate;
+      inputArea.appendChild(calcBtn);
+
+      loadSavedInputs();
     }
-  
-    function computeExpectedTime(p_list, T_list) {
+
+    function calculate() {
+      const p_list = Array.from(document.getElementsByClassName('prob')).map(e => parseFloat(e.value.trim()));
+      const T_list = Array.from(document.getElementsByClassName('time')).map(e => parseFloat(e.value.trim()));
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '';
+
+      localStorage.setItem(LS_P_LIST, JSON.stringify(p_list));
+      localStorage.setItem(LS_T_LIST, JSON.stringify(T_list));
+
+      if (p_list.some(isNaN) || T_list.some(isNaN)) {
+        resultDiv.innerHTML = '<span style="color:#d15;">数字として正しく入力してください。</span>';
+        return;
+      }
+      if (p_list.some(p => p < 0 || p > 1)) {
+        resultDiv.innerHTML = '<span style="color:#d15;">確率の値を正しく入力してください。</span>';
+        return;
+      }
+      for (let i = 1; i < T_list.length; i++) {
+        if (T_list[i] < T_list[i - 1]) {
+          resultDiv.innerHTML = '<span style="color:#d15;">時間リストは昇順である必要があります。</span>';
+          return;
+        }
+      }
+      if (T_list.length !== p_list.length + 1) {
+        resultDiv.innerHTML = '<span style="color:#d15;">時間リストは確率リストより1つ多くしてください。</span>';
+        return;
+      }
+
       const n = p_list.length;
       let result = 0.0;
       for (let k = 0; k < n; ++k) {
@@ -149,48 +170,92 @@
         for (let j = k; j < n; ++j) prod *= p_list[j];
         result += (1 - p_list[k]) / prod * T_list[k];
       }
-      return result + T_list[n];
+      result += T_list[n];
+
+      resultDiv.innerHTML = `期待時間：<b style="font-size:1.4em;">${result.toFixed(5)}</b>`;
+
+      drawTimeline(T_list, p_list);
     }
-  
-    function calculate() {
-      const pVal = document.getElementById('p_list').value;
-      const tVal = document.getElementById('T_list').value;
-      // 入力内容を保存
-      localStorage.setItem(LS_P_LIST, pVal);
-      localStorage.setItem(LS_T_LIST, tVal);
-  
-      const p_list = parseInput(pVal);
-      const T_list = parseInput(tVal);
-      const resultDiv = document.getElementById('result');
-      resultDiv.innerHTML = '';
-      if (p_list.some(isNaN) || T_list.some(isNaN)) {
-        resultDiv.innerHTML = '<span style="color:#d15;">数字として正しく入力してください。</span>';
-        return;
-      }
-      if (T_list.length !== p_list.length + 1) {
-        resultDiv.innerHTML = '<span style="color:#d15;">時間リスト(T_list)は確率リストより<b>1つ多く</b>入力してください。</span>';
-        return;
-      }
-      const expectedTime = computeExpectedTime(p_list, T_list);
-      resultDiv.innerHTML = '期待時間（理論値）:<br><b style="font-size:1.4em;color:#246;">' + expectedTime.toFixed(5) + '</b>';
+
+    function loadSavedInputs() {
+      try {
+        const savedCount = parseInt(localStorage.getItem(LS_EVENT_COUNT));
+        if (!isNaN(savedCount) && savedCount >= 1) {
+          document.getElementById('event_count').value = savedCount;
+        }
+        const p_saved = JSON.parse(localStorage.getItem(LS_P_LIST));
+        const t_saved = JSON.parse(localStorage.getItem(LS_T_LIST));
+        if (Array.isArray(p_saved) && Array.isArray(t_saved)) {
+          const probInputs = document.getElementsByClassName('prob');
+          const timeInputs = document.getElementsByClassName('time');
+          p_saved.forEach((val, i) => { if (probInputs[i]) probInputs[i].value = val });
+          t_saved.forEach((val, i) => { if (timeInputs[i]) timeInputs[i].value = val });
+        }
+      } catch (_) {}
     }
-    
-  
-    // 入力欄の値が変更されたら即座に保存＆計算
-    document.addEventListener('DOMContentLoaded', () => {
-      const pInput = document.getElementById('p_list');
-      const tInput = document.getElementById('T_list');
-      // 保存されている値で初期化
-      const pVal = localStorage.getItem(LS_P_LIST);
-      const tVal = localStorage.getItem(LS_T_LIST);
-      if (pVal !== null) pInput.value = pVal;
-      if (tVal !== null) tInput.value = tVal;
-  
-      // 入力時に自動保存・自動再計算
-      pInput.addEventListener('input', calculate);
-      tInput.addEventListener('input', calculate);
-  
-      calculate(); // 初期表示
+
+    function drawTimeline(times, probs) {
+      const svg = document.getElementById("timeline");
+      svg.innerHTML = '';
+      const marginLeft = 40;
+      const baseY = 100;
+      const scale = 80;
+
+      const maxX = (times.length - 1) * scale + marginLeft;
+      svg.setAttribute("width", `${maxX + 40}`);
+      svg.setAttribute("viewBox", `0 0 ${maxX + 40} 200`);
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", marginLeft);
+      line.setAttribute("y1", baseY);
+      line.setAttribute("x2", maxX);
+      line.setAttribute("y2", baseY);
+      line.setAttribute("stroke", "black");
+      line.setAttribute("stroke-width", "2");
+      svg.appendChild(line);
+
+      times.forEach((t, i) => {
+        const x = marginLeft + i * scale;
+        const tick = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        tick.setAttribute("x1", x);
+        tick.setAttribute("y1", baseY - 10);
+        tick.setAttribute("x2", x);
+        tick.setAttribute("y2", baseY + 10);
+        tick.setAttribute("stroke", "black");
+        svg.appendChild(tick);
+
+        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        label.setAttribute("x", x - 10);
+        label.setAttribute("y", baseY + 20);
+        label.textContent = t;
+        svg.appendChild(label);
+      });
+
+      for (let i = 0; i < probs.length; i++) {
+        const from = marginLeft + (i + 1) * scale;
+        const to = marginLeft + i * scale;
+        const midX = (from + to) / 2;
+        const curveY = baseY - 40 - Math.abs(from - to) / 10;
+
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", `M ${from} ${baseY - 10} C ${from} ${curveY}, ${to} ${curveY}, ${to} ${baseY - 10}`);
+        path.setAttribute("stroke", "black");
+        path.setAttribute("fill", "none");
+        svg.appendChild(path);
+
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", midX - 10);
+        text.setAttribute("y", curveY - 5);
+        text.textContent = probs[i];
+        svg.appendChild(text);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedCount = parseInt(localStorage.getItem(LS_EVENT_COUNT));
+      if (!isNaN(savedCount) && savedCount >= 1) {
+        document.getElementById('event_count').value = savedCount;
+      }
+      generateInputs();
     });
   </script>
 </body>
