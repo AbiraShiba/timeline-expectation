@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <title>タイムライン期待時間計算機</title>
@@ -12,6 +13,7 @@
       margin: 0;
       padding: 0;
     }
+
     .container {
       max-width: 700px;
       margin: 48px auto;
@@ -23,18 +25,22 @@
       flex-direction: column;
       gap: 18px;
     }
+
     h2 {
       text-align: center;
       color: #4157d9;
       margin-bottom: 6px;
       letter-spacing: 0.02em;
     }
+
     label {
       font-weight: bold;
       color: #234;
       display: block;
     }
-    input[type="number"], input[type="text"] {
+
+    input[type="number"],
+    input[type="text"] {
       width: 100%;
       font-size: 1.1em;
       padding: 0.7em 0.6em;
@@ -44,6 +50,7 @@
       box-sizing: border-box;
       background: #f6f8ff;
     }
+
     button {
       background: linear-gradient(90deg, #4157d9 70%, #54a2e7 100%);
       color: #fff;
@@ -55,6 +62,7 @@
       cursor: pointer;
       box-shadow: 0 2px 8px #c2d0f8aa;
     }
+
     .output {
       padding: 1em;
       background: #f1f5ff;
@@ -63,6 +71,7 @@
       color: #264386;
       text-align: center;
     }
+
     svg {
       margin-top: 24px;
       width: 100%;
@@ -71,6 +80,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h2>タイムライン期待時間計算機</h2>
@@ -80,7 +90,9 @@
     <button onclick="generateInputs()">入力欄を生成</button>
 
     <div id="input_area"></div>
-    <svg id="timeline" style="margin-top:24px; width:100%; height:auto; min-height:200px; border:1px solid #ccc; display:block;" preserveAspectRatio="xMinYMin meet"></svg>
+    <svg id="timeline"
+      style="margin-top:24px; width:100%; height:auto; min-height:200px; border:1px solid #ccc; display:block;"
+      preserveAspectRatio="xMinYMin meet"></svg>
     <div class="output" id="result"></div>
   </div>
 
@@ -98,32 +110,58 @@
       inputArea.innerHTML = '';
 
       const pLabel = document.createElement('label');
-      pLabel.textContent = `確率リスト（成功確率）:`;
+      pLabel.textContent = `確率・時間リスト（縦並び）:`;
+      pLabel.style.textAlign = 'center';
       inputArea.appendChild(pLabel);
-
       for (let i = 0; i < count; i++) {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.className = 'prob';
-        input.placeholder = `p[${i}] 例: 0.9`;
-        input.addEventListener('focus', e => e.target.select());
-        input.addEventListener('input', saveInputs);
-        inputArea.appendChild(input);
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.gap = '1em';
+        row.style.marginBottom = '6px';
+
+        const pInput = document.createElement('input');
+        pInput.type = 'text';
+        pInput.className = 'prob';
+        pInput.placeholder = `p[${i}] 例: 0.9`;
+        pInput.style.flex = '1';
+        pInput.addEventListener('focus', e => e.target.select());
+        pInput.addEventListener('input', saveInputs);
+
+        const tInput = document.createElement('input');
+        tInput.type = 'text';
+        tInput.className = 'time';
+        tInput.placeholder = `T[${i}] 例: 10`;
+        tInput.style.flex = '1';
+        tInput.addEventListener('focus', e => e.target.select());
+        tInput.addEventListener('input', saveInputs);
+
+        row.appendChild(tInput);
+        row.appendChild(pInput);
+        inputArea.appendChild(row);
       }
 
-      const tLabel = document.createElement('label');
-      tLabel.textContent = `時間リスト（発生時刻 + 終了時刻）:`;
-      inputArea.appendChild(tLabel);
+      const row = document.createElement('div');
+      row.style.display = 'flex';
+      row.style.gap = '1em';
+      row.style.marginBottom = '6px';
 
-      for (let i = 0; i < count + 1; i++) {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.className = 'time';
-        input.placeholder = `T[${i}] 例: 10`;
-        input.addEventListener('focus', e => e.target.select());
-        input.addEventListener('input', saveInputs);
-        inputArea.appendChild(input);
-      }
+      const tInput = document.createElement('input');
+      tInput.type = 'text';
+      tInput.className = 'time';
+      tInput.placeholder = `T[${count}] 例: 99`;
+      tInput.style.flex = '1';
+      tInput.addEventListener('focus', e => e.target.select());
+      tInput.addEventListener('input', saveInputs);
+
+      const hiddenProbInput = document.createElement('input');
+      hiddenProbInput.type = 'text';
+      hiddenProbInput.className = 'dummy';
+      hiddenProbInput.style.visibility = 'hidden';
+      hiddenProbInput.style.flex = '1';
+
+      row.appendChild(tInput);
+      row.appendChild(hiddenProbInput);
+      inputArea.appendChild(row);
 
       const spacer = document.createElement('div');
       spacer.style.height = '1em';
@@ -200,7 +238,7 @@
           p_saved.forEach((val, i) => { if (probInputs[i]) probInputs[i].value = val });
           t_saved.forEach((val, i) => { if (timeInputs[i]) timeInputs[i].value = val });
         }
-      } catch (_) {}
+      } catch (_) { }
     }
 
     function drawTimeline(times, probs) {
@@ -268,4 +306,5 @@
     });
   </script>
 </body>
+
 </html>
