@@ -107,6 +107,7 @@
         input.className = 'prob';
         input.placeholder = `p[${i}] 例: 0.9`;
         input.addEventListener('focus', e => e.target.select());
+        input.addEventListener('input', saveInputs);
         inputArea.appendChild(input);
       }
 
@@ -120,6 +121,7 @@
         input.className = 'time';
         input.placeholder = `T[${i}] 例: 10`;
         input.addEventListener('focus', e => e.target.select());
+        input.addEventListener('input', saveInputs);
         inputArea.appendChild(input);
       }
 
@@ -133,6 +135,13 @@
       inputArea.appendChild(calcBtn);
 
       loadSavedInputs();
+    }
+
+    function saveInputs() {
+      const p_list = Array.from(document.getElementsByClassName('prob')).map(e => e.value.trim());
+      const T_list = Array.from(document.getElementsByClassName('time')).map(e => e.value.trim());
+      localStorage.setItem(LS_P_LIST, JSON.stringify(p_list));
+      localStorage.setItem(LS_T_LIST, JSON.stringify(T_list));
     }
 
     function calculate() {
