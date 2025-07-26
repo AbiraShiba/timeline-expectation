@@ -91,9 +91,6 @@
 
     <div id="input_area"></div>
     <div class="output" id="result"></div>
-    <svg id="timeline"
-      style="margin-top:24px; width:100%; height:auto; min-height:200px; border:1px solid #ccc; display:block;"
-      preserveAspectRatio="xMinYMin meet"></svg>
   </div>
 
   <script>
@@ -115,7 +112,7 @@
       inputArea.innerHTML = '';
 
       const pLabel = document.createElement('label');
-      pLabel.textContent = `確率・時間リスト（縦並び）:`;
+      pLabel.textContent = `確率（％）・時間（秒）リスト`;
       pLabel.style.textAlign = 'center';
       inputArea.appendChild(pLabel);
       for (let i = 0; i < count; i++) {
@@ -127,7 +124,7 @@
         const pInput = document.createElement('input');
         pInput.type = 'text';
         pInput.className = 'prob';
-        pInput.placeholder = `イベント${i + 1}の確率 例: 0.5`;
+        pInput.placeholder = `イベント ${i + 1} の確率（％）例：80）`;
         pInput.style.flex = '1';
         pInput.addEventListener('focus', e => e.target.select());
         pInput.addEventListener('input', saveInputs);
@@ -135,7 +132,7 @@
         const tInput = document.createElement('input');
         tInput.type = 'text';
         tInput.className = 'time';
-        tInput.placeholder = `イベント${i + 1}の時間 例: 32`;
+        tInput.placeholder = `イベント ${i + 1} の時間（例：32）`;
         tInput.style.flex = '1';
         tInput.addEventListener('focus', e => e.target.select());
         tInput.addEventListener('input', saveInputs);
@@ -159,7 +156,7 @@
       const tInput = document.createElement('input');
       tInput.type = 'text';
       tInput.className = 'time';
-      tInput.placeholder = `戦闘終了時間 例: 99`;
+      tInput.placeholder = `戦闘終了時間（例：120）`;
       tInput.style.flex = '1';
       tInput.addEventListener('focus', e => e.target.select());
       tInput.addEventListener('input', saveInputs);
@@ -200,7 +197,7 @@
         resultDiv.innerHTML = '<span style="color:#d15;">数字として正しく入力してください。</span>';
         return;
       }
-      if (p_list.some(p => p < 0 || p > 1)) {
+      if (p_list.some(p => p < 0 || p > 100)) {
         resultDiv.innerHTML = '<span style="color:#d15;">確率の値を正しく入力してください。</span>';
         return;
       }
@@ -210,9 +207,18 @@
           return;
         }
       }
+      if (T_list[0] < 0) {
+        resultDiv.innerHTML = '<span style="color:#d15;">時間は正である必要があります。</span>';
+        return;
+      }
       if (T_list.length !== p_list.length + 1) {
         resultDiv.innerHTML = '<span style="color:#d15;">時間リストは確率リストより1つ多くしてください。</span>';
         return;
+      }
+
+      // パーセントから割合への変換
+      for (let i = 0; i < p_list.length; i++) {
+        p_list[i] = 1 / 100 * p_list[i];
       }
 
       const n = p_list.length;
@@ -224,7 +230,7 @@
       }
       result += T_list[n];
 
-      resultDiv.innerHTML = `期待時間：<b style="font-size:1.4em;">${result.toFixed(5)}</b>`;
+      resultDiv.innerHTML = `期待時間：<b style="font-size:1.4em;">${(result / 60).toFixed(2)} </b> 分`;
 
       drawTimeline(T_list, p_list);
     }
@@ -244,62 +250,6 @@
           t_saved.forEach((val, i) => { if (timeInputs[i]) timeInputs[i].value = val });
         }
       } catch (_) { }
-    }
-
-    function drawTimeline(times, probs) {
-      const svg = document.getElementById("timeline");
-      svg.innerHTML = '';
-      const marginLeft = 40;
-      const baseY = 100;
-      const scale = 80;
-
-      const maxX = (times.length - 1) * scale + marginLeft;
-      svg.setAttribute("width", `${maxX + 40}`);
-      svg.setAttribute("viewBox", `0 0 ${maxX + 40} 200`);
-      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      line.setAttribute("x1", marginLeft);
-      line.setAttribute("y1", baseY);
-      line.setAttribute("x2", maxX);
-      line.setAttribute("y2", baseY);
-      line.setAttribute("stroke", "black");
-      line.setAttribute("stroke-width", "2");
-      svg.appendChild(line);
-
-      times.forEach((t, i) => {
-        const x = marginLeft + i * scale;
-        const tick = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        tick.setAttribute("x1", x);
-        tick.setAttribute("y1", baseY - 10);
-        tick.setAttribute("x2", x);
-        tick.setAttribute("y2", baseY + 10);
-        tick.setAttribute("stroke", "black");
-        svg.appendChild(tick);
-
-        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        label.setAttribute("x", x - 10);
-        label.setAttribute("y", baseY + 20);
-        label.textContent = t;
-        svg.appendChild(label);
-      });
-
-      for (let i = 0; i < probs.length; i++) {
-        const from = marginLeft + (i + 1) * scale;
-        const to = marginLeft + i * scale;
-        const midX = (from + to) / 2;
-        const curveY = baseY - 40 - Math.abs(from - to) / 10;
-
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", `M ${from} ${baseY - 10} C ${from} ${curveY}, ${to} ${curveY}, ${to} ${baseY - 10}`);
-        path.setAttribute("stroke", "black");
-        path.setAttribute("fill", "none");
-        svg.appendChild(path);
-
-        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        text.setAttribute("x", midX - 10);
-        text.setAttribute("y", curveY - 5);
-        text.textContent = probs[i];
-        svg.appendChild(text);
-      }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
